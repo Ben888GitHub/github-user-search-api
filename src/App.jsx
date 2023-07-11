@@ -30,6 +30,7 @@ function App() {
 		if (res.status === 404) {
 			console.log(res.status);
 			console.log(data);
+			return;
 		} else {
 			console.log(data);
 			return data;
