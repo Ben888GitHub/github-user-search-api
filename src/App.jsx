@@ -48,7 +48,7 @@ function App() {
 		queryKey: ['githubUser', input], // just like key in localstorage, you can check in ReactQueryDevtools
 		queryFn: () => getUserProfile(input), // function to request and render the data
 		refetchOnMount: true, //  This helps in keeping the data displayed to the user up-to-date.
-		keepPreviousData: true,
+		// keepPreviousData: true,
 		enabled: !!input, // if input is empty, then don't make a request, otherwise, make a request
 		refetchOnWindowFocus: false, // Data is not going to be re-fetched when any interaction takes place within the window
 		staleTime: 60000
