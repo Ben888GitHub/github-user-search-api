@@ -5,6 +5,22 @@ import Searchbar from './components/Searchbar';
 import Loader from './components/Loader';
 import { useQuery } from '@tanstack/react-query';
 
+// function to dynamically fetch github user API
+const getUserProfile = async (profileInput) => {
+	try {
+		const res = await fetch(`https://api.github.com/users/${profileInput}`);
+		const data = await res.json();
+
+		if (!res.ok) {
+			// Handle non-successful responses generically or throw an error
+			throw new Error(`Error: ${res.status} - ${data.message}`);
+		}
+		return data;
+	} catch (err) {
+		console.error('Failed to fetch user profile:', err);
+	}
+};
+
 function App() {
 	const [user, setUser] = useState({
 		username: ''
@@ -24,41 +40,34 @@ function App() {
 		});
 	}
 
-	const getUserProfile = async (profileInput) => {
-		const res = await fetch(`https://api.github.com/users/${profileInput}`);
-		const data = await res.json();
-		if (res.status === 404) {
-			console.log(res.status);
-			console.log(data);
-			return;
-		} else {
-			console.log(data);
-			return data;
-		}
-	};
-
 	const {
 		data: github,
 		isLoading,
 		error
 	} = useQuery({
-		queryKey: ['githubUser', input],
-		queryFn: () => getUserProfile(input),
-		refetchOnMount: true,
+		queryKey: ['githubUser', input], // just like key in localstorage, you can check in ReactQueryDevtools
+		queryFn: () => getUserProfile(input), // function to request and render the data
+		refetchOnMount: true, //  This helps in keeping the data displayed to the user up-to-date.
 		keepPreviousData: true,
-		enabled: !!input,
-		refetchOnWindowFocus: false
+		enabled: !!input, // if input is empty, then don't make a request, otherwise, make a request
+		refetchOnWindowFocus: false, // Data is not going to be re-fetched when any interaction takes place within the window
+		staleTime: 60000
 	});
 
+	// handleClick function will be invoked in Searchbar.jsx
 	function handleClick(event) {
 		event.preventDefault();
 		console.log(user);
 		setInput(user.username);
+		setUser((prevUser) => ({
+			...prevUser,
+			username: ''
+		}));
 	}
 	function toggleTheme() {
 		setTheme((prevTheme) => !prevTheme);
 	}
-	// github && console.log(github);
+
 	return (
 		<div
 			className={`${
